@@ -75,6 +75,16 @@ func intersection(a, b []snakePoint) ([]snakePoint, error) {
 	return s[1:], nil
 }
 
+// contains tells whether a contains x.
+func contains(a []snakePoint, x snakePoint) (int, error) {
+	for i, n := range a {
+		if x == n {
+			return i, nil
+		}
+	}
+	return 0, errors.New("error")
+}
+
 func manhattanDistance(s []snakePoint) (int, error) {
 	md := math.MaxInt
 	for _, p := range s {
@@ -89,8 +99,53 @@ func manhattanDistance(s []snakePoint) (int, error) {
 
 }
 
+func calculateManhattanDistance(s1, s2 []snakePoint) (int, error) {
+	intersect, err := intersection(s1, s2)
+	if err != nil {
+		fmt.Errorf("Error while creating the intersection - %v", err)
+	}
+
+	d, err := manhattanDistance(intersect)
+	if err != nil {
+		fmt.Println(err)
+		return -1, err
+	}
+	return d, nil
+}
+
+func pointPathDistance(s snakePoint, s1, s2 []snakePoint) int {
+	d1, err := contains(s1, s)
+	if err != nil {
+		fmt.Errorf("error calculating snake1 distance: %v", err)
+	}
+
+	d2, err := contains(s2, s)
+	if err != nil {
+		fmt.Errorf("error calculating snake2 distance: %v", err)
+	}
+	return d1 + d2
+}
+
+func calculateShortestPathDistance(s1, s2 []snakePoint) (int, error) {
+	intersect, err := intersection(s1, s2)
+	if err != nil {
+		fmt.Errorf("Error while creating the intersection - %v", err)
+	}
+
+	pd := math.MaxInt
+	for _, p := range intersect {
+		if cd := pointPathDistance(p, s1, s2); cd < pd {
+			pd = cd
+		}
+	}
+	if pd == math.MaxInt {
+		return pd, errors.New("No ShortestPathDistnace calculated")
+	}
+	return pd, nil
+}
+
 func main() {
-	f, err := os.Open("input")
+	f, err := os.Open("input1")
 	if err != nil {
 		fmt.Errorf("err: %v", err)
 	}
@@ -100,17 +155,19 @@ func main() {
 	for fileScanner.Scan() {
 		snakes = append(snakes, fileScanner.Text())
 	}
-
 	snake1 := newSnakePath(snakes[0])
 	snake2 := newSnakePath(snakes[1])
-	intersect, err := intersection(snake1, snake2)
-	if err != nil {
-		fmt.Errorf("Error while creating the intersection - %v", err)
-	}
 
-	d, err := manhattanDistance(intersect)
+	//md, err := calculateManhattanDistance(snake1, snake2)
+	//if err != nil {
+	//	fmt.Println(err)
+	//}
+	//fmt.Printf("Manhattan Distance is: %d", md)
+
+	pd, err := calculateShortestPathDistance(snake1, snake2)
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Printf("Manhattan Distance: %v\n", d)
+	fmt.Printf("Shorted Point Distance is: %d", pd)
+
 }
