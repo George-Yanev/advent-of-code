@@ -3,12 +3,15 @@ package main
 import (
 	"fmt"
 	"strconv"
+
+	"golang.org/x/exp/maps"
+	"golang.org/x/exp/slices"
 )
 
 const start int = 109165
 const end int = 576723
 
-// const end int = 123789
+//const end int = 123789
 
 func nextIncreasing(n int) int {
 	//fmt.Println("Next number to increase: ", n)
@@ -54,6 +57,19 @@ func checkDoubles(n int) bool {
 	return false
 }
 
+func oneDouble(n int) bool {
+	s := strconv.Itoa(n)
+	var m = map[int]int{}
+	for _, d := range s {
+		m[int(d)]++
+	}
+	v := maps.Values(m)
+	if slices.Contains(v, 2) {
+		return true
+	}
+	return false
+}
+
 func main() {
 	var passwords []int
 	loopBreaker := true
@@ -70,7 +86,7 @@ func main() {
 				currentStart = n
 				break
 			}
-			if checkDoubles(n) {
+			if checkDoubles(n) && oneDouble(n) {
 				passwords = append(passwords, n)
 			}
 		}
