@@ -29,7 +29,14 @@ func main() {
 		if err != nil {
 			fmt.Errorf("Cannot convert this mass to int: %v", m)
 		}
-		total += moduleFuelRequirement(i)
+		f := moduleFuelRequirement(i)
+		total += f
+		fmt.Println("Initial fuel requirement: ", f)
+		for f >= 9 {
+			f = moduleFuelRequirement(f)
+			fmt.Println("Each following iteration: ", f)
+			total += f
+		}
 	}
 	fmt.Println("Total mass is ", total)
 }
