@@ -9,6 +9,9 @@ import (
 	"strconv"
 )
 
+const maxNoun int = 12
+const maxVerb int = 2
+
 // ReadInts reads whitespace-separated ints from r. If there's an error, it
 // returns the ints successfully read so far as well as the error value.
 func ReadInts(r io.Reader) ([]int, error) {
@@ -60,7 +63,7 @@ func main() {
 		//fmt.Println(len(input))
 		input[1] = noun
 		input[2] = verb
-		if noun+verb > 198 {
+		if noun+verb > maxNoun+maxVerb {
 			fmt.Printf("noun: %d and verb: %d reached their limit\n", noun, verb)
 			return
 		}
@@ -95,9 +98,9 @@ func main() {
 				}
 			}
 		}
-		if verb < 99 {
+		if verb < maxVerb {
 			verb++
-		} else if verb == 99 {
+		} else if verb == maxVerb {
 			noun++
 			verb = 0
 		}
