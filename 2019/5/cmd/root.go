@@ -4,7 +4,6 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"bufio"
 	"encoding/csv"
 	"fmt"
 	"io"
@@ -17,15 +16,18 @@ import (
 const maxNoun int = 12
 const maxVerb int = 2
 
-var input int
+var id int
+var input []int
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "2019-day5",
-	Short: "AdventOfCode",
+	Short: "AdventOfCode day5",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Printf("The input parameter is %d\n", input)
+		input, _ = cmd.Flags().GetIntSlice("input")
+		fmt.Printf("The input parameter is %v\n", input)
+		fmt.Printf("The id parameter is %d\n", id)
 	},
 }
 
@@ -34,30 +36,17 @@ var rootCmd = &cobra.Command{
 func Execute() {
 	err := rootCmd.Execute()
 	if err != nil {
+		fmt.Println("oops")
 		os.Exit(1)
 	}
+	main()
 }
 
 func init() {
-	rootCmd.Flags().IntVarP(&input, "input", "i", 0, "The digit parameter value")
-	rootCmd.MarkFlagRequired("input")
+	rootCmd.Flags().IntVarP(&id, "id", "i", 0, "The digit parameter value")
+	rootCmd.Flags().IntSliceP("input", "n", []int{}, "Program input")
+	rootCmd.MarkFlagRequired("id")
 
-}
-
-// ReadInts reads whitespace-separated ints from r. If there's an error, it
-// returns the ints successfully read so far as well as the error value.
-func ReadInts(r io.Reader) ([]int, error) {
-	scanner := bufio.NewScanner(r)
-	scanner.Split(bufio.ScanLines)
-	var result []int
-	for scanner.Scan() {
-		x, err := strconv.Atoi(scanner.Text())
-		if err != nil {
-			return result, err
-		}
-		result = append(result, x)
-	}
-	return result, scanner.Err()
 }
 
 func ReadFile(f string) []int {
@@ -88,9 +77,12 @@ func ReadFile(f string) []int {
 }
 
 func main() {
+	fmt.Println("ID is", id)
+	fmt.Println("Input length", len(input))
 	for {
-		input := ReadFile("input")
-		fmt.Println("Input length", len(input))
+		if len(input) == 0 {
+			input = ReadFile("input")
+		}
 		i := 0
 		for i < len(input) {
 			var opcode, mode1, mode2, parameter1, parameter2, parameter3, output int
@@ -145,6 +137,12 @@ func main() {
 				} else {
 					parameter1 = input[i+1]
 				}
+				if mode2 == 0 {
+					inputTmp := input[i+2]
+					parameter2 = input[inputTmp]
+				} else {
+					parameter2 = input[i+2]
+				}
 				if parameter1 != 0 {
 					i = parameter2
 				} else {
@@ -157,8 +155,14 @@ func main() {
 				} else {
 					parameter1 = input[i+1]
 				}
+				if mode2 == 0 {
+					inputTmp := input[i+2]
+					parameter2 = input[inputTmp]
+				} else {
+					parameter2 = input[i+2]
+				}
 				if parameter1 == 0 {
-					i = parameter1
+					i = parameter2
 				} else {
 					i += 2
 				}
@@ -183,7 +187,27 @@ func main() {
 				} else {
 					input[parameter3] = 0
 				}
+			case opcode == 8:
+				if mode1 == 0 {
+					inputTmp := input[i+1]
+					parameter1 = input[inputTmp]
+				} else {
+					parameter1 = input[i+1]
+				}
 
+				if mode2 == 0 {
+					inputTmp := input[i+2]
+					parameter2 = input[inputTmp]
+				} else {
+					parameter2 = input[i+2]
+				}
+
+				parameter3 = input[i+3]
+				if parameter1 == parameter2 {
+					input[parameter3] = 1
+				} else {
+					input[parameter3] = 0
+				}
 			case opcode == 99:
 				//fmt.Println("reached opcode 99...Print left-overs: ", input[i:])
 				//fmt.Println("result is: ", input[0])
