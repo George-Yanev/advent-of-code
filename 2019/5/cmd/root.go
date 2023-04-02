@@ -9,45 +9,7 @@ import (
 	"io"
 	"os"
 	"strconv"
-
-	"github.com/spf13/cobra"
 )
-
-const maxNoun int = 12
-const maxVerb int = 2
-
-var id int
-var input []int
-
-// rootCmd represents the base command when called without any subcommands
-var rootCmd = &cobra.Command{
-	Use:   "2019-day5",
-	Short: "AdventOfCode day5",
-	Long:  ``,
-	Run: func(cmd *cobra.Command, args []string) {
-		input, _ = cmd.Flags().GetIntSlice("input")
-		fmt.Printf("The input parameter is %v\n", input)
-		fmt.Printf("The id parameter is %d\n", id)
-	},
-}
-
-// Execute adds all child commands to the root command and sets flags appropriately.
-// This is called by main.main(). It only needs to happen once to the rootCmd.
-func Execute() {
-	err := rootCmd.Execute()
-	if err != nil {
-		fmt.Println("oops")
-		os.Exit(1)
-	}
-	main()
-}
-
-func init() {
-	rootCmd.Flags().IntVarP(&id, "id", "i", 0, "The digit parameter value")
-	rootCmd.Flags().IntSliceP("input", "n", []int{}, "Program input")
-	rootCmd.MarkFlagRequired("id")
-
-}
 
 func ReadFile(f string) []int {
 	r, err := os.Open(f)
@@ -76,7 +38,7 @@ func ReadFile(f string) []int {
 	return final
 }
 
-func main() {
+func main2() {
 	fmt.Println("ID is", id)
 	fmt.Println("Input length", len(input))
 	for {
@@ -187,6 +149,7 @@ func main() {
 				} else {
 					input[parameter3] = 0
 				}
+				i += 3
 			case opcode == 8:
 				if mode1 == 0 {
 					inputTmp := input[i+1]
@@ -203,11 +166,14 @@ func main() {
 				}
 
 				parameter3 = input[i+3]
+				fmt.Println("Parameter3 value is", input[parameter3])
 				if parameter1 == parameter2 {
 					input[parameter3] = 1
 				} else {
 					input[parameter3] = 0
 				}
+				fmt.Println("after opcode 8 input is", input)
+				i += 3
 			case opcode == 99:
 				//fmt.Println("reached opcode 99...Print left-overs: ", input[i:])
 				//fmt.Println("result is: ", input[0])
