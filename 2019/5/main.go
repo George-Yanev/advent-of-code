@@ -6,5 +6,5 @@ package main
 import "2022-day5/cmd"
 
 func main() {
-	cmd.Execute2()
+	cmd.Execute()
 }

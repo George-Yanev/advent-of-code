@@ -11,7 +11,7 @@ import (
 )
 
 var id int
-var input []int
+var in []int
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -19,15 +19,15 @@ var rootCmd = &cobra.Command{
 	Short: "AdventOfCode day5",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		input, _ = cmd.Flags().GetIntSlice("input")
-		fmt.Printf("The input parameter is %v\n", input)
+		in, _ = cmd.Flags().GetIntSlice("input")
+		fmt.Printf("The in parameter is %v\n", in)
 		fmt.Printf("The id parameter is %d\n", id)
 	},
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
-func Execute2() {
+func Execute() {
 	err := rootCmd.Execute()
 	if err != nil {
 		fmt.Println("oops")
@@ -54,10 +54,156 @@ func separateDigits(n int) (int, int, int, int) {
 
 // test the separateDigits function
 func testSeparateDigits() {
-	a, b, c, d := separateDigits(1002)
+	a, b, c, d := separateDigits(1003)
 	fmt.Println(a, b, c, d)
 }
 
+// based on testSeparateDigits function first parameter is the opcode
+// second parameter is the mode of the first parameter
+// third parameter is the mode of the second parameter
+// fourth parameter is the mode of the third parameter
+func getOpcode(n int) (int, int, int, int) {
+	a, b, c, d := separateDigits(n)
+	return d, c, b, a
+}
+
+// based on opcode it will be decided what to do
+// 1 - add
+// 2 - multiply
+// 3 - input
+// 4 - output
+// 5 - jump-if-true
+// 6 - jump-if-false
+// 7 - less than
+// 8 - equals
+// 99 - halt
+func getOperation(n int) int {
+	a, _, _, _ := getOpcode(n)
+	return a
+}
+
+// use the opcode to to get all necessary parameters
+// for the opcode operation
+func getParameterModes(n int) (int, int, int) {
+	_, c, b, _ := getOpcode(n)
+	return c, b, 0
+}
+
+// opcode 1 - add
+func add(a, b int) int {
+	return a + b
+}
+
+// opcode 2 - multiply
+func multiply(a, b int) int {
+	return a * b
+}
+
+// opcode 3 - input
+func input() int {
+	var a int
+	fmt.Println("Please enter a number: ")
+	fmt.Scan(&a)
+	return a
+}
+
+// opcode 4 - output
+func output(a int) {
+	fmt.Println("Output is: ", a)
+}
+
+// loop through the input and execute the operations
+func execute(in []int, id int) {
+	for i := 0; i < len(in); {
+		opcode := getOperation(in[i])
+		fmt.Println("opcode is: ", opcode)
+		switch {
+		case opcode == 1:
+			var parameter1, parameter2 int
+			// add
+			// get parameter modes
+			mode1, mode2, _ := getParameterModes(in[i])
+			if mode1 == 0 {
+				fmt.Println("mode1 is 0")
+				// get the values
+				parameter1 = in[in[i+1]]
+			} else {
+				fmt.Println("mode1 is 1")
+				// get the values
+				parameter1 = in[i+1]
+			}
+			if mode2 == 0 {
+				fmt.Println("mode2 is 0")
+				// get the values
+				parameter2 = in[in[i+2]]
+			} else {
+				fmt.Println("mode2 is 1")
+				// get the values
+				parameter2 = in[i+2]
+			}
+			// calculate the result
+			result := add(parameter1, parameter2)
+			// store the result
+			in[in[i+3]] = result
+			// increment the index
+			i += 4
+		case opcode == 2:
+			// multiply
+			var parameter1, parameter2 int
+			// get parameters
+			mode1, mode2, _ := getParameterModes(in[i])
+			// get the values
+			if mode1 == 0 {
+				fmt.Println("mode1 is 0")
+				// get the values
+				parameter1 = in[in[i+1]]
+			} else {
+				fmt.Println("mode1 is 1")
+				// get the values
+				parameter1 = in[i+1]
+			}
+			if mode2 == 0 {
+				fmt.Println("mode2 is 0")
+				// get the values
+				parameter2 = in[in[i+2]]
+			} else {
+				fmt.Println("mode2 is 1")
+				// get the values
+				parameter2 = in[i+2]
+			}
+			// calculate the result
+			result := multiply(parameter1, parameter2)
+			// store the result
+			in[in[i+3]] = result
+			// increment the index
+			i += 4
+		case opcode == 3:
+			// input
+			// get the value
+			parameter1 := id
+			// store the result
+			in[in[i+1]] = parameter1
+			// increment the index
+			i += 2
+		case opcode == 4:
+			// output
+			// get the value
+			parameter1 := in[in[i+1]]
+			// output the result
+			output(parameter1)
+			// increment the index
+			i += 2
+		case opcode == 99:
+			// halt
+			fmt.Println("Halt. Program finished. Result is - ", in)
+			return
+		default:
+			fmt.Println("Unknown opcode")
+			return
+		}
+	}
+}
+
 func main() {
-	testSeparateDigits()
+	execute(in, id)
 }
