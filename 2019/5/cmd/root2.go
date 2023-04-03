@@ -190,6 +190,7 @@ func execute(in []int, id int) {
 			i += 4
 		case opcode == 3:
 			// input
+
 			// get the value
 			parameter1 := id
 			// store the result
@@ -198,13 +199,21 @@ func execute(in []int, id int) {
 			i += 2
 		case opcode == 4:
 			// output
+
+			// get parameter modes
+			mode1, _, _ := getParameterModes(in[i])
+
 			// get the value
-			parameter1 := in[in[i+1]]
+			parameter1 := getParameter(in[i+1], mode1)
+
 			// output the result
 			output(parameter1)
 			// increment the index
 			i += 2
 		case opcode == 5:
+			// jump-if-true
+
+			// get parameter modes
 			mode1, mode2, _ := getParameterModes(in[i])
 			parameter1 := getParameter(in[i+1], mode1)
 			parameter2 := getParameter(in[i+2], mode2)
@@ -215,6 +224,7 @@ func execute(in []int, id int) {
 				i += 3
 			}
 		case opcode == 6:
+			// jump-if-false
 			mode1, mode2, _ := getParameterModes(in[i])
 			parameter1 := getParameter(in[i+1], mode1)
 			parameter2 := getParameter(in[i+2], mode2)
