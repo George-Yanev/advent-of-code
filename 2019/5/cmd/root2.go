@@ -124,6 +124,38 @@ func output(a int) {
 	fmt.Println("Output is: ", a)
 }
 
+// opcode 5 - jump-if-true
+func jumpIfTrue(a, b int) int {
+	if a != 0 {
+		return b
+	}
+	return 0
+}
+
+// opcode 6 - jump-if-false
+func jumpIfFalse(a, b int) int {
+	if a == 0 {
+		return b
+	}
+	return 0
+}
+
+// opcode 7 - less than
+func lessThan(a, b int) int {
+	if a < b {
+		return 1
+	}
+	return 0
+}
+
+// opcode 8 - equals
+func equals(a, b int) int {
+	if a == b {
+		return 1
+	}
+	return 0
+}
+
 // loop through the input and execute the operations
 func execute(in []int, id int) {
 	for i := 0; i < len(in); {
@@ -172,6 +204,47 @@ func execute(in []int, id int) {
 			output(parameter1)
 			// increment the index
 			i += 2
+		case opcode == 5:
+			mode1, mode2, _ := getParameterModes(in[i])
+			parameter1 := getParameter(in[i+1], mode1)
+			parameter2 := getParameter(in[i+2], mode2)
+			result := jumpIfTrue(parameter1, parameter2)
+			if result == parameter2 {
+				i = result
+			} else {
+				i += 3
+			}
+		case opcode == 6:
+			mode1, mode2, _ := getParameterModes(in[i])
+			parameter1 := getParameter(in[i+1], mode1)
+			parameter2 := getParameter(in[i+2], mode2)
+			result := jumpIfFalse(parameter1, parameter2)
+			if result == parameter2 {
+				i = result
+			} else {
+
+				i += 3
+			}
+		case opcode == 7:
+			mode1, mode2, _ := getParameterModes(in[i])
+			parameter1 := getParameter(in[i+1], mode1)
+			parameter2 := getParameter(in[i+2], mode2)
+			if parameter1 < parameter2 {
+				in[in[i+3]] = 1
+			} else {
+				in[in[i+3]] = 0
+			}
+			i += 4
+		case opcode == 8:
+			mode1, mode2, _ := getParameterModes(in[i])
+			parameter1 := getParameter(in[i+1], mode1)
+			parameter2 := getParameter(in[i+2], mode2)
+			if parameter1 == parameter2 {
+				in[in[i+3]] = 1
+
+			} else {
+				in[in[i+3]] = 0
+			}
 		case opcode == 99:
 			// halt
 			fmt.Println("Halt. Program finished. Result is - ", in)
