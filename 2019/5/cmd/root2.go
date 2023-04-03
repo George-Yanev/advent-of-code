@@ -245,6 +245,7 @@ func execute(in []int, id int) {
 			} else {
 				in[in[i+3]] = 0
 			}
+			i += 4
 		case opcode == 99:
 			// halt
 			fmt.Println("Halt. Program finished. Result is - ", in)
