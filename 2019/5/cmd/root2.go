@@ -89,6 +89,18 @@ func getParameterModes(n int) (int, int, int) {
 	return c, b, 0
 }
 
+// based on the mode it will be decided what to do
+// 0 - position mode
+// 1 - immediate mode
+// If the parameter is in position mode, its value is the value stored at the address given by the parameter.
+// If the parameter is in immediate mode, its value is simply the value of the parameter.
+func getParameter(n int, mode int) int {
+	if mode == 0 {
+		return in[n]
+	}
+	return n
+}
+
 // opcode 1 - add
 func add(a, b int) int {
 	return a + b
@@ -119,28 +131,12 @@ func execute(in []int, id int) {
 		fmt.Println("opcode is: ", opcode)
 		switch {
 		case opcode == 1:
-			var parameter1, parameter2 int
 			// add
 			// get parameter modes
 			mode1, mode2, _ := getParameterModes(in[i])
-			if mode1 == 0 {
-				fmt.Println("mode1 is 0")
-				// get the values
-				parameter1 = in[in[i+1]]
-			} else {
-				fmt.Println("mode1 is 1")
-				// get the values
-				parameter1 = in[i+1]
-			}
-			if mode2 == 0 {
-				fmt.Println("mode2 is 0")
-				// get the values
-				parameter2 = in[in[i+2]]
-			} else {
-				fmt.Println("mode2 is 1")
-				// get the values
-				parameter2 = in[i+2]
-			}
+			// get the values
+			parameter1 := getParameter(in[i+1], mode1)
+			parameter2 := getParameter(in[i+2], mode2)
 			// calculate the result
 			result := add(parameter1, parameter2)
 			// store the result
@@ -149,28 +145,11 @@ func execute(in []int, id int) {
 			i += 4
 		case opcode == 2:
 			// multiply
-			var parameter1, parameter2 int
 			// get parameters
 			mode1, mode2, _ := getParameterModes(in[i])
 			// get the values
-			if mode1 == 0 {
-				fmt.Println("mode1 is 0")
-				// get the values
-				parameter1 = in[in[i+1]]
-			} else {
-				fmt.Println("mode1 is 1")
-				// get the values
-				parameter1 = in[i+1]
-			}
-			if mode2 == 0 {
-				fmt.Println("mode2 is 0")
-				// get the values
-				parameter2 = in[in[i+2]]
-			} else {
-				fmt.Println("mode2 is 1")
-				// get the values
-				parameter2 = in[i+2]
-			}
+			parameter1 := getParameter(in[i+1], mode1)
+			parameter2 := getParameter(in[i+2], mode2)
 			// calculate the result
 			result := multiply(parameter1, parameter2)
 			// store the result
