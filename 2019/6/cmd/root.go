@@ -6,12 +6,12 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/spf13/cobra"
 )
 
-var id int
-var in []int
+var in []string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -19,7 +19,7 @@ var rootCmd = &cobra.Command{
 	Short: "AdventOfCode day5",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		in, _ = cmd.Flags().GetIntSlice("input")
+		in, _ = cmd.Flags().GetStringSlice("input")
 		fmt.Printf("The in parameter is %v\n", in)
 	},
 }
@@ -41,7 +41,7 @@ func init() {
 
 }
 
-func execute(in []int) {
+func execute(in []string) {
 	fmt.Printf("The in parameter is %v\n", in)
 
 	// initiate a map of string to int
@@ -50,11 +50,13 @@ func execute(in []int) {
 	// loop over the input
 	// the input is a two strings separated by a ) character
 	// the first string is the body and the second string is the orbiter
-	for _, line := range in {
+	for i := 1; i <len(in); i++ {
 		// split the line into the body and the orbiter
-		body, orbiter := line[0], line[1]
+		l := strings.Split(line, ")")
+		body := l[0]
+		orbiter := l[1]
 		// add the orbiter to the body's list of orbiters
-		structure[body] = orbiter
+		structure[orbiter] = 
 	}
 }
 
