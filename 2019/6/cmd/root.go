@@ -18,10 +18,6 @@ type Node struct {
 	Children []*Node
 }
 
-type Graph struct {
-	Nodes map[string]*Node
-}
-
 func (n *Node) AddChild(name string) {
 	child := &Node{Name: name}
 	n.Children = append(n.Children, child)
@@ -62,33 +58,29 @@ func init() {
 }
 
 func execute(in string) {
-	fmt.Printf("The in parameter is %v\n", in)
-	g := &Graph{
-		Nodes: make(map[string]*Node),
-	}
+	fmt.Printf("The in parameter is:\n%v\n", in)
 	// loop over the input
 	// the input is a two strings separated by a ) character
 	// the first string is the body and the second string is the orbiter
+	tree := make(map[string]*Node)
 	for _, line := range strings.Split(in, "\n") {
+
 		// split the line into the body and the orbiter
 		l := strings.Split(line, ")")
 		body, orbiter := l[0], l[1]
 
-		_, ok := g.Nodes[body]
+		_, ok := tree[body]
 		if !ok {
-			g.Nodes[body] = &Node{Name: body}
+			tree[body] = &Node{Name: body}
 		}
 
-		_, ok = g.Nodes[orbiter]
-		if !ok {
-			g.Nodes[orbiter] = &Node{Name: orbiter}
-		}
-		g.Nodes[body].Children = append(g.Nodes[body].Children, g.Nodes[orbiter])
+		tree[body].AddChild(orbiter)
 
 	}
 
 	fmt.Println("start printing")
-	g.Nodes["COM"].printDFS(2)
+	tree["COM"].printDFS(2)
+	fmt.Printf("tree is %v\n", tree["B"])
 
 }
 
