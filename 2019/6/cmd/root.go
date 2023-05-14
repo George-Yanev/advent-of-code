@@ -14,17 +14,21 @@ import (
 var total int
 
 type Node struct {
-	Data     interface{}
+	Name     string
 	Children []*Node
 }
 
-func (n *Node) AddChild(data interface{}) {
-	child := &Node{Data: data}
+type Graph struct {
+	Nodes map[string]*Node
+}
+
+func (n *Node) AddChild(name string) {
+	child := &Node{Name: name}
 	n.Children = append(n.Children, child)
 }
 
 func (n *Node) printDFS(indent int) {
-	fmt.Println(strings.Repeat(" ", indent), n.Data)
+	fmt.Println(strings.Repeat(" ", indent), n.Name)
 
 	for _, child := range n.Children {
 		child.printDFS(indent)
@@ -59,32 +63,33 @@ func init() {
 
 func execute(in string) {
 	fmt.Printf("The in parameter is %v\n", in)
-	orbits := map[string]string{}
+	g := &Graph{
+		Nodes: make(map[string]*Node),
+	}
 	// loop over the input
 	// the input is a two strings separated by a ) character
 	// the first string is the body and the second string is the orbiter
 	for _, line := range strings.Split(in, "\n") {
 		// split the line into the body and the orbiter
 		l := strings.Split(line, ")")
-		body := l[0]
-		orbiter := l[1]
-		// add the orbiter to the body's list of orbiters
-		orbits[body] = orbiter
-	}
-	fmt.Println("map structure is", orbits)
+		body, orbiter := l[0], l[1]
 
-	// create the tree and the root node
-	tree := &Node{Data: "COM"}
-	for i := 0; i < len(orbits); i++ {
+		_, ok := g.Nodes[body]
+		if !ok {
+			g.Nodes[body] = &Node{Name: body}
+		}
 
-	}
-	// create the tree
-	for k, v := range orbits {
-		fmt.Printf("key is %s, value is %s\n", k, v)
-
-		//
+		_, ok = g.Nodes[orbiter]
+		if !ok {
+			g.Nodes[orbiter] = &Node{Name: orbiter}
+		}
+		g.Nodes[body].Children = append(g.Nodes[body].Children, g.Nodes[orbiter])
 
 	}
+
+	fmt.Println("start printing")
+	g.Nodes["COM"].printDFS(2)
+
 }
 
 func main() {
