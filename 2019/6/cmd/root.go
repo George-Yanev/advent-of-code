@@ -17,6 +17,12 @@ var weight int
 type Node struct {
 	Name     string
 	Children []*Node
+	Parent   *Node
+}
+
+// String function to print all Node properties
+func (n *Node) String() string {
+	return fmt.Sprintf("Node %v has %v children and parent %v", n.Name, len(n.Children), n.Parent.Name)
 }
 
 func (n *Node) AddChild(child *Node) {
@@ -24,11 +30,18 @@ func (n *Node) AddChild(child *Node) {
 }
 
 func (n *Node) printDFS(indent int) {
-	// fmt.Println(strings.Repeat(" ", indent), n.Name)
+	fmt.Println(strings.Repeat(" ", indent), n.Name)
 
-	weight += indent
 	for _, child := range n.Children {
 		child.printDFS(indent + 1)
+	}
+}
+
+// print recursively the parent Name of the Node
+func (n *Node) printParents() {
+	if n.Parent != nil {
+		fmt.Printf("%v,", n.Parent.Name)
+		n.Parent.printParents()
 	}
 }
 
@@ -77,7 +90,14 @@ func execute(in string) {
 
 		_, ok = tree[orbiter] // check if the orbiter is already in the tree
 		if !ok {
-			tree[orbiter] = &Node{Name: orbiter}
+			tree[orbiter] = &Node{Name: orbiter, Parent: tree[body]}
+		} else {
+			ok := tree[orbiter].Parent // check if the orbiter has a parent
+			if ok != nil {
+				fmt.Printf("orbiter %v already has a parent %v\n", orbiter, tree[orbiter].Parent.Name)
+			} else {
+				tree[orbiter].Parent = tree[body]
+			}
 		}
 
 		tree[body].AddChild(tree[orbiter])
@@ -85,9 +105,12 @@ func execute(in string) {
 	}
 
 	// fmt.Println("start printing")
-	tree["COM"].printDFS(0)
-	fmt.Printf("weight is %v\n", weight)
+	// tree["COM"].printDFS(0)
+	// fmt.Printf("weight is %v\n", weight)
 	// fmt.Printf("tree is %v\n", tree)
+
+	// fmt.Println(tree)
+	tree["YOU"].printParents()
 
 }
 
