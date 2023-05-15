@@ -12,22 +12,23 @@ import (
 )
 
 var total int
+var weight int
 
 type Node struct {
 	Name     string
 	Children []*Node
 }
 
-func (n *Node) AddChild(name string) {
-	child := &Node{Name: name}
+func (n *Node) AddChild(child *Node) {
 	n.Children = append(n.Children, child)
 }
 
 func (n *Node) printDFS(indent int) {
-	fmt.Println(strings.Repeat(" ", indent), n.Name)
+	// fmt.Println(strings.Repeat(" ", indent), n.Name)
 
+	weight += indent
 	for _, child := range n.Children {
-		child.printDFS(indent)
+		child.printDFS(indent + 1)
 	}
 }
 
@@ -58,7 +59,7 @@ func init() {
 }
 
 func execute(in string) {
-	fmt.Printf("The in parameter is:\n%v\n", in)
+	// fmt.Printf("The in parameter is:\n%v\n", in)
 	// loop over the input
 	// the input is a two strings separated by a ) character
 	// the first string is the body and the second string is the orbiter
@@ -69,18 +70,24 @@ func execute(in string) {
 		l := strings.Split(line, ")")
 		body, orbiter := l[0], l[1]
 
-		_, ok := tree[body]
+		_, ok := tree[body] // check if the body is already in the tree
 		if !ok {
 			tree[body] = &Node{Name: body}
 		}
 
-		tree[body].AddChild(orbiter)
+		_, ok = tree[orbiter] // check if the orbiter is already in the tree
+		if !ok {
+			tree[orbiter] = &Node{Name: orbiter}
+		}
+
+		tree[body].AddChild(tree[orbiter])
 
 	}
 
-	fmt.Println("start printing")
-	tree["COM"].printDFS(2)
-	fmt.Printf("tree is %v\n", tree["B"])
+	// fmt.Println("start printing")
+	tree["COM"].printDFS(0)
+	fmt.Printf("weight is %v\n", weight)
+	// fmt.Printf("tree is %v\n", tree)
 
 }
 
