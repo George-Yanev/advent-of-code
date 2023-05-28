@@ -14,6 +14,8 @@ import (
 var total int
 var weight int
 
+type StringSlice []string
+
 type Node struct {
 	Name     string
 	Children []*Node
@@ -37,12 +39,40 @@ func (n *Node) printDFS(indent int) {
 	}
 }
 
+var p StringSlice
+
 // print recursively the parent Name of the Node
-func (n *Node) printParents() {
+func (n *Node) printParents() *StringSlice {
 	if n.Parent != nil {
-		fmt.Printf("%v,", n.Parent.Name)
+		// fmt.Printf("%v,", n.Parent.Name)
+		p = append(p, n.Parent.Name)
 		n.Parent.printParents()
 	}
+	return &p
+}
+
+// reverse the elements of StringSlice
+func (s *StringSlice) Reverse() StringSlice {
+	for i, j := 0, len(*s)-1; i < j; i, j = i+1, j-1 {
+		// fmt.Printf("i=%v, j=%v\n", i, j)
+		(*s)[i], (*s)[j] = (*s)[j], (*s)[i]
+	}
+	return *s
+}
+
+func (s StringSlice) Difference(other StringSlice) StringSlice {
+	otherSet := make(map[string]bool)
+	for _, str := range other {
+		otherSet[str] = true
+	}
+
+	var diff StringSlice
+	for _, str := range s {
+		if !otherSet[str] {
+			diff = append(diff, str)
+		}
+	}
+	return diff
 }
 
 var input string
@@ -103,14 +133,6 @@ func execute(in string) {
 		tree[body].AddChild(tree[orbiter])
 
 	}
-
-	// fmt.Println("start printing")
-	// tree["COM"].printDFS(0)
-	// fmt.Printf("weight is %v\n", weight)
-	// fmt.Printf("tree is %v\n", tree)
-
-	// fmt.Println(tree)
-	tree["YOU"].printParents()
 
 }
 
