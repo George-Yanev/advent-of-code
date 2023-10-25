@@ -5,99 +5,98 @@ import (
 	"strings"
 )
 
-type StringSlice []string
+// type Nodes []*Node
 
 type Node struct {
-	Name     string
-	Children []*Node
-	Parent   *Node
+	Name   string
+	Parent string
+	Left   string
+	Right  string
+}
+
+type HashMapTree struct {
+	hash map[string]*Node
+}
+
+type Queue struct {
+	nodes []*Node
+}
+
+func (q *Queue) Enqueue(n *Node) {
+	q.nodes = append(q.nodes, n)
+}
+
+func (q *Queue) Dequeue() *Node {
+	if len(q.nodes) == 0 {
+		return nil
+	}
+
+	item := q.nodes[0]
+	q.nodes = q.nodes[1:]
+	return item
+}
+
+func (q *Queue) IsEmpty() bool {
+	return len(q.nodes) == 0
 }
 
 // String function to print all Node properties
 func (n *Node) String() string {
-	return fmt.Sprintf("Node %v has %v children and parent %v", n.Name, len(n.Children), n.Parent.Name)
+	// return fmt.Sprintf("Node %v has %v children and parent %v", n.Name, len(n.Children), n.Parent.Name)
+	return fmt.Sprintf(n.Name)
 }
 
-func (n *Node) AddChild(child *Node) {
-	n.Children = append(n.Children, child)
-}
-
-func (n *Node) printDFS(indent int) {
-	fmt.Println(strings.Repeat(" ", indent), n.Name)
-
-	for _, child := range n.Children {
-		child.printDFS(indent + 1)
-	}
-}
-
-var p StringSlice
-
-// print recursively the parent Name of the Node
-func (n *Node) printParents() *StringSlice {
-	if n.Parent != nil {
-		// fmt.Printf("%v,", n.Parent.Name)
-		p = append(p, n.Parent.Name)
-		n.Parent.printParents()
-	}
-	return &p
-}
-
-// reverse the elements of StringSlice
-func (s *StringSlice) Reverse() StringSlice {
-	for i, j := 0, len(*s)-1; i < j; i, j = i+1, j-1 {
-		// fmt.Printf("i=%v, j=%v\n", i, j)
-		(*s)[i], (*s)[j] = (*s)[j], (*s)[i]
-	}
-	return *s
-}
-
-func (s StringSlice) Difference(other StringSlice) StringSlice {
-	otherSet := make(map[string]bool)
-	for _, str := range other {
-		otherSet[str] = true
-	}
-
-	var diff StringSlice
-	for _, str := range s {
-		if !otherSet[str] {
-			diff = append(diff, str)
+func ConvertInputToMap(m []string) map[string][]string {
+	myMap := make(map[string][]string)
+	for _, value := range m {
+		t := strings.Split(value, ")")
+		lcom := t[0]
+		orbiter := t[1]
+		if _, ok := myMap[lcom]; !ok {
+			myMap[lcom] = []string{orbiter}
+		} else {
+			myMap[lcom] = append(myMap[lcom], orbiter)
 		}
+
 	}
-	return diff
+	return myMap
 }
 
-// Traverse the Tree using the Breadth-First Traversal algorithm
-func (n *Node) printBFT() {
-	// Create a queue (FIFO)
-	queue := []*Node{n}
-
-	for len(queue) > 0 {
-		// Pop the first element from the queue
-		node := queue[0]
-		queue = queue[1:]
-
-		fmt.Println(node.Name)
-
-		// Add all children to the queue
-		for _, child := range node.Children {
-			queue = append(queue, child)
-		}
-	}
-}
-
-// create a Queue to append and remove Nodes from it
-type Queue []*Node
-
-func (q *Queue) Push(node *Node) {
-	*q = append(*q, node)
-}
-
-func (q *Queue) Pop() *Node {
-	if len(*q) == 0 {
-		return nil
+func (b *HashMapTree) Insert(parentName string, nodeName string, childrensNames []string, initialMap map[string][]string) {
+	if len(childrensNames) == 0 {
+		return
 	}
 
-	node := (*q)[0]
-	*q = (*q)[1:]
-	return node
+	left := childrensNames[0]
+	node := &Node{
+		Name:   nodeName,
+		Parent: parentName,
+		Left:   left,
+		Right:  "",
+	}
+	b.Insert(nodeName, left, initialMap[left], initialMap)
+
+	if len(childrensNames) > 1 {
+		right := childrensNames[1]
+		node.Right = right
+		b.Insert(nodeName, right, initialMap[right], initialMap)
+	}
+
+	b.hash[nodeName] = node
+
+}
+
+func (b *HashMapTree) Print(nodeName string, level int) {
+	node, ok := b.hash[nodeName]
+	if !ok {
+		return
+	}
+
+	for i := 0; i < level; i++ {
+		fmt.Print(" ")
+	}
+
+	fmt.Printf("Node: %s, Parent: %s, Left child: %s, Right child: %s\n", node.Name, node.Parent, node.Left, node.Right)
+	b.Print(node.Left, level+1)
+	b.Print(node.Right, level+1)
 }
