@@ -43,7 +43,7 @@ func (q *Queue) IsEmpty() bool {
 // String function to print all Node properties
 func (n *Node) String() string {
 	// return fmt.Sprintf("Node %v has %v children and parent %v", n.Name, len(n.Children), n.Parent.Name)
-	return fmt.Sprintf(n.Name)
+	return fmt.Sprintf(n.Parent)
 }
 
 func ConvertInputToMap(m []string) map[string][]string {
@@ -64,6 +64,13 @@ func ConvertInputToMap(m []string) map[string][]string {
 
 func (b *HashMapTree) Insert(parentName string, nodeName string, childrensNames []string, initialMap map[string][]string) {
 	if len(childrensNames) == 0 {
+		node := &Node{
+			Name:   nodeName,
+			Parent: parentName,
+			Left:   "",
+			Right:  "",
+		}
+		b.hash[nodeName] = node
 		return
 	}
 
@@ -99,4 +106,19 @@ func (b *HashMapTree) Print(nodeName string, level int) {
 	fmt.Printf("Node: %s, Parent: %s, Left child: %s, Right child: %s\n", node.Name, node.Parent, node.Left, node.Right)
 	b.Print(node.Left, level+1)
 	b.Print(node.Right, level+1)
+}
+
+func (b *HashMapTree) findNodeRootPath(node string) []string {
+	path := []string{}
+
+	start := b.hash[node]
+	parent := start.Parent
+	for start.Name != parent {
+		//fmt.Println(start.Name)
+		start = b.hash[parent]
+		parent = b.hash[start.Parent].Name
+		path = append(path, start.Name)
+	}
+	fmt.Println(path)
+	return path
 }

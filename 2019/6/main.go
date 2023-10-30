@@ -54,7 +54,7 @@ var rootCmd = &cobra.Command{
 		}
 
 		// Now you can process the inputs
-		fmt.Println(mycmd.Root(inputs))
+		mycmd.Root(inputs)
 	},
 }
 
